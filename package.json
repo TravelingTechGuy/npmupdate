@@ -6,8 +6,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Guy Vider",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TravelingTechGuy/npmupdate"
+  },
+  "bugs": {
+    "url": "https://github.com/TravelingTechGuy/npmupdate/issues"
+  },
+  "readmeFilename": "README.md",
   "dependencies": {
     "chalk": "^0.5.1",
     "commander": "^2.3.0",
