@@ -1,0 +1,16 @@
+{
+  "name": "NPMUpdater",
+  "version": "0.0.1",
+  "description": "Shell script to update all global/local NPM modules but NPM itself",
+  "main": "npmUpdate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^0.5.1",
+    "commander": "^2.3.0",
+    "npm": "^1.4.23"
+  }
+}
