@@ -2,17 +2,22 @@
 
 'use strict';
 
+//global modules and variables
 var assert = require('assert'),
-	chalk = require('chalk'),
-	modulesToUpdate = [],
-	config = {
-		'depth': 0
-	};
-
+	chalk = require('chalk');
+	
+/**
+ * Main entry to program, parses input, and loads NPM
+ * @return {[type]} [description]
+ */
 var main = function() {
 	var npm = require('npm'),
 		program = require('commander'),
-		list = function(val) {return val.split(',');};
+		list = function(val) {return val.split(',');},
+		modulesToUpdate = [],
+		config = {
+			'depth': 0
+		};
 
 	//Command line parameters
 	program
@@ -29,7 +34,7 @@ var main = function() {
 	if(config.silent) {
 		config.loglevel = 'silent';
 	}
-
+	//check for user-provided module names
 	if(program.module && program.module.length > 0) {
 		modulesToUpdate = program.module;
 	}
@@ -41,25 +46,31 @@ var main = function() {
 		assert.equal(err, null, 'Error loading NPM');
 		if(modulesToUpdate.length === 0) {
 			//look for NPM outdated modules
-			getOudtaedModules(npm, function() {
-				updateModules(npm);
+			getOudtaedModules(npm, function(modules) {
+				updateModules(npm, modules);
 			});
 		}
 		else {
-			updateModules(npm);
+			updateModules(npm, modulesToUpdate);
 		}
 	});
 };
 
+/**
+ * Gets list of outdated modules and prints current and desired versions
+ * @param  {Object}   npm NPM API object
+ * @param  {Function} cb  callback
+ */
 var getOudtaedModules = function(npm, cb) {
+	var modulesToUpdate = [];
 	npm.commands.outdated([], true, function(err, data) {
 		assert.equal(err, null, 'Error finding outdated modules');
 		//collect names of outdated modules
 		if(data !== null && Array.isArray(data) && data.length > 0) {
 			for(var i = 0; i < data.length; i++) {
 				var module = data[i];
-				//ignore global NPM out of date - should be installed the way NPM was installed originally (like MacPort)
-				if(module[1] === 'npm' && config.global) {
+				//ignore global NPM out of date - should be updated the way NPM was originally installed (like MacPort)
+				if(module[1] === 'npm' && npm.config.get('global')) {
 					console.log(chalk.bgBlue.white('npm') + ' version ' + chalk.bgYellow.white(module[2]) + ':\tplease update using MacPort to version ' + chalk.bgYellow.white(module[3]));
 				}
 				else {
@@ -68,11 +79,16 @@ var getOudtaedModules = function(npm, cb) {
 				}
 			}
 		}
-		return cb();
+		return cb(modulesToUpdate);
 	});
 };
 
-var updateModules = function(npm) {
+/**
+ * Updates provided modules
+ * @param  {Object} npm NPM API object
+ * @param {Array} modulesToUpdate array of module names
+ */
+var updateModules = function(npm, modulesToUpdate) {
 	if(modulesToUpdate.length > 0) {
 		console.log(chalk.bgBlue.white('now updating ' + modulesToUpdate.toString() + '...'));
 		//update outdated modules
